@@ -62,7 +62,7 @@ java -jar target/sistema-recomendacion-compra2-0.0.1-SNAPSHOT.jar --spring.profi
 ./mvnw test
 
 
-## Estructura del proyecto
+## Estructura del proyectos
 
 src/main/java/com/example/recomendation/
 ├── config/ # Configuración de Spring (seguridad, app)

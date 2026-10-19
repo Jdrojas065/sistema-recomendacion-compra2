@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Activar MFA</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class=" py-4">
+            <h2>Activar verificación en dos pasos (TOTP)</h2>
+
+            <p th:if="${error}" th:text="${error}" class="text-danger"></p>
+
+            <ol>
+                <li>Abre Google Authenticator (o Authy) en tu celular.</li>
+                <li>Escanea este código QR:</li>
+            </ol>
+
+            <img th:src="${qrImage}" alt="Código QR MFA" style="width:220px;height:220px;"/>
+
+            <p>O ingresa manualmente esta clave: <code th:text="${secret}"></code></p>
+
+            <form th:action="@{/profile/mfa/enable}" method="post">
+                <input type="hidden" name="secret" th:value="${secret}"/>
+                <div class="mb-3">
+                    <label class="form-label">Código de 6 dígitos de la app:</label>
+                    <input type="text" name="code" class="form-control" maxlength="6" required autofocus/>
+                </div>
+                <button type="submit" class="btn btn-primary">Activar MFA</button>
+            </form>
+        </main>
+
+</div>
+</body>
+</html>

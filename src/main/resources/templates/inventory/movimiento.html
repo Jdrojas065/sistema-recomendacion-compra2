@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Registrar movimiento</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class="py-4">
+
+            <h2 class="mb-4"><i class="bi bi-arrow-left-right me-2"></i>Registrar movimiento de inventario</h2>
+
+            <form th:action="@{/inventory/movements}" th:object="${movementForm}" method="post" class="card p-4" style="max-width: 560px;">
+                <div class="mb-3">
+                    <label class="form-label">Producto</label>
+                    <select th:field="*{productId}" class="form-select">
+                        <option value="">Selecciona un producto</option>
+                        <option th:each="p : ${products}" th:value="${p.id}"
+                                th:text="${p.name + ' (stock: ' + p.currentStock + ')'}"></option>
+                    </select>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('productId')}" th:errors="*{productId}"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tipo</label>
+                        <select th:field="*{type}" class="form-select">
+                            <option value="IN">Entrada</option>
+                            <option value="OUT">Salida</option>
+                        </select>
+                        <div class="text-danger small" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" th:field="*{quantity}" class="form-control">
+                        <div class="text-danger small" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Fecha del movimiento</label>
+                    <input type="date" th:field="*{movementDate}" class="form-control" style="max-width: 220px;">
+                    <div class="form-text">Usa la fecha real en que llegó o salió la mercancía, no necesariamente hoy.</div>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('movementDate')}" th:errors="*{movementDate}"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Número de lote <span class="text-muted">(opcional)</span></label>
+                        <input type="text" th:field="*{lotNumber}" class="form-control" placeholder="Ej: L-2026-09">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Vencimiento del lote <span class="text-muted">(solo en entradas)</span></label>
+                        <input type="date" th:field="*{expirationDate}" class="form-control">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Descripción <span class="text-muted">(opcional)</span></label>
+                    <input type="text" th:field="*{description}" class="form-control">
+                </div>
+
+                <div class="d-flex gap-2 mt-2">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Registrar</button>
+                    <a th:href="@{/inventory/stock}" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
+
+        </main>
+    </div>
+</body>
+</html>

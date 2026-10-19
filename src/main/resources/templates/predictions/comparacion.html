@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Comparación de predicciones</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+    <main class="py-4">
+
+        <div class="mb-3">
+            <h2 class="mb-1" th:text="${product.name}">Producto</h2>
+            <p class="text-muted mb-0">Comparación de demanda proyectada: método tradicional vs. Machine Learning.</p>
+        </div>
+
+        <details class="info-disclosure mb-4" style="max-width: 760px;">
+            <summary><i class="bi bi-info-circle"></i> ¿Cómo se calculan estos valores?</summary>
+            <div class="info-disclosure-body">
+                <p>
+                    <strong>Método tradicional (promedio móvil):</strong> se calcula dividiendo la cantidad total
+                    vendida de este producto entre el número de ventas registradas en los últimos 6 meses. Es un
+                    cálculo estadístico simple, sin inteligencia artificial (RF08).
+                </p>
+                <p>
+                    <strong>Machine Learning (Random Forest):</strong> modelo entrenado en un servicio Python
+                    independiente. Recibe como entrada el día de la semana, el mes, la rotación del producto, el
+                    stock actual, el promedio tradicional recién calculado, la categoría y los días desde la última
+                    venta — y combina estas variables de forma no lineal para generar su propia proyección (RF09).
+                </p>
+                <p class="mb-0">
+                    <strong>Nota de transparencia:</strong> el modelo se entrenó con un conjunto de datos sintético
+                    (generado para simular patrones de venta realistas), no con el historial real de un negocio en
+                    producción. Es una decisión consciente para esta entrega académica; los valores de Machine
+                    Learning deben interpretarse como demostración del funcionamiento del pipeline completo
+                    (Spring Boot ↔ servicio Python ↔ modelo), no como una predicción con validez estadística
+                    garantizada todavía.
+                </p>
+            </div>
+        </details>
+
+        <div class="alert alert-warning d-flex align-items-start gap-2" th:unless="${comparison.traditionalSufficientData()}" style="max-width: 760px;">
+            <i class="bi bi-exclamation-triangle-fill mt-1"></i>
+            <div>
+                No hay suficiente historial de ventas de este producto para un promedio móvil confiable
+                (se necesitan al menos 3 registros). El valor tradicional mostrado abajo es orientativo.
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3" style="max-width: 760px;">
+            <div class="col-md-6">
+                <div class="card prediction-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="text-muted mb-1">Método tradicional</h6>
+                                <span class="text-muted small">Promedio móvil</span>
+                            </div>
+                            <span class="prediction-icon prediction-icon-traditional">
+                                <i class="bi bi-calculator"></i>
+                            </span>
+                        </div>
+                        <p class="prediction-value" th:text="${#numbers.formatDecimal(comparison.traditionalPrediction(), 1, 2)}">0.00</p>
+                        <span class="badge bg-warning text-dark" th:unless="${comparison.traditionalSufficientData()}">
+                            <i class="bi bi-exclamation-circle"></i> Datos insuficientes
+                        </span>
+                        <span class="badge bg-light text-muted border" th:if="${comparison.traditionalSufficientData()}">
+                            <i class="bi bi-check-circle"></i> Cálculo confiable
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card prediction-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="text-muted mb-1">Machine Learning</h6>
+                                <span class="text-muted small">Random Forest</span>
+                            </div>
+                            <span class="prediction-icon prediction-icon-ml">
+                                <i class="bi bi-cpu"></i>
+                            </span>
+                        </div>
+                        <p class="prediction-value" th:if="${comparison.mlAvailable()}"
+                           th:text="${#numbers.formatDecimal(comparison.mlPrediction(), 1, 2)}">0.00</p>
+                        <p class="prediction-value text-muted" th:unless="${comparison.mlAvailable()}">&mdash;</p>
+                        <span class="badge bg-secondary" th:unless="${comparison.mlAvailable()}">
+                            <i class="bi bi-wifi-off"></i> No disponible
+                        </span>
+                        <span class="badge bg-light text-muted border" th:if="${comparison.mlAvailable()}">
+                            <i class="bi bi-check-circle"></i> Respuesta recibida
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-panel mb-4" style="max-width: 760px;" th:if="${comparison.mlAvailable()}">
+            <i class="bi bi-lightbulb text-muted"></i>
+            <span th:if="${comparison.mlPrediction() > comparison.traditionalPrediction()}">
+                El modelo de Machine Learning proyecta
+                <strong th:text="${#numbers.formatDecimal(comparison.mlPrediction() - comparison.traditionalPrediction(), 1, 2)} + ' unidades más'">0</strong>
+                que el método tradicional.
+            </span>
+            <span th:unless="${comparison.mlPrediction() > comparison.traditionalPrediction()}">
+                El modelo de Machine Learning proyecta
+                <strong th:text="${#numbers.formatDecimal(comparison.traditionalPrediction() - comparison.mlPrediction(), 1, 2)} + ' unidades menos'">0</strong>
+                que el método tradicional.
+            </span>
+        </div>
+        <div class="insight-panel mb-4" style="max-width: 760px;" th:unless="${comparison.mlAvailable()}">
+            <i class="bi bi-info-circle text-muted"></i>
+            <span>El servicio de Machine Learning no respondió — se está usando únicamente el método tradicional mientras tanto.</span>
+        </div>
+
+        <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Volver al producto
+        </a>
+
+    </main>
+</div>
+</body>
+</html>

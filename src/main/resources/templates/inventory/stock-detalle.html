@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Detalle de stock</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class=" py-4">
+
+            <h2 class="mb-4" th:text="${product.name}">Producto</h2>
+            <p>Stock actual: <strong th:text="${product.currentStock}">0</strong></p>
+            <p>Stock mínimo: <strong th:text="${product.minimumStock}">0</strong></p>
+
+            <a th:href="@{/inventory/history/{id}(id=${product.id})}" class="btn btn-outline-secondary btn-sm">Ver historial</a>
+            <a th:href="@{/inventory/stock}" class="btn btn-secondary btn-sm">Volver</a>
+
+        </main>
+    </div>
+</body>
+</html>

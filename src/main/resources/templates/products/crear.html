@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Nuevo producto</title>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class=" py-4">
+
+            <h2 class="mb-4"><i class="bi bi-box-seam me-2"></i>Nuevo producto</h2>
+
+            <form th:action="@{/products}" th:object="${productForm}" method="post" class="card p-4" style="max-width: 640px;">
+
+                <h6 class="text-uppercase text-muted small fw-bold mb-3">Datos del producto</h6>
+
+                <div class="mb-3">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" th:field="*{name}" class="form-control">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Código de barras <span class="text-muted">(opcional)</span></label>
+                    <div class="input-group">
+                        <input type="text" th:field="*{barcode}" id="barcodeInput" class="form-control"
+                               placeholder="Escanea o digita el código" inputmode="numeric">
+                        <button type="button" id="toggleScanBtn" class="btn btn-outline-secondary">
+                            <i class="bi bi-camera"></i> Escanear
+                        </button>
+                    </div>
+                    <div id="barcodeScannerBox" class="mt-2" style="display:none;">
+                        <div id="barcodeReader" style="width: 100%; max-width: 350px;"></div>
+                        <div id="barcodeScanStatus" class="small text-muted mt-1"></div>
+                    </div>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('barcode')}" th:errors="*{barcode}"></div>
+                    <div class="text-danger small" th:if="${barcodeError}" th:text="${barcodeError}"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Precio</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" step="0.01" th:field="*{price}" class="form-control">
+                        </div>
+                        <div class="text-danger small" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Categoría</label>
+                        <select th:field="*{categoryId}" class="form-select">
+                            <option value="">Selecciona una categoría</option>
+                            <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                        </select>
+                        <div class="text-danger small" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Stock mínimo</label>
+                    <input type="number" th:field="*{minimumStock}" class="form-control" style="max-width: 200px;">
+                    <div class="form-text">Cantidad a partir de la cual el sistema debe alertar reabastecimiento.</div>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('minimumStock')}" th:errors="*{minimumStock}"></div>
+                </div>
+
+                <hr class="my-4">
+
+                <h6 class="text-uppercase text-muted small fw-bold mb-1">Stock inicial (opcional)</h6>
+                <p class="text-muted small mb-3">
+                    Si ya llegó mercancía de este producto, regístrala aquí para que quede
+                    reflejada de una vez en el inventario y su historial de movimientos.
+                </p>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Cantidad que llegó</label>
+                        <input type="number" min="0" th:field="*{initialStock}" class="form-control">
+                        <div class="text-danger small" th:if="${#fields.hasErrors('initialStock')}" th:errors="*{initialStock}"></div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Fecha de llegada</label>
+                        <input type="date" th:field="*{entryDate}" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">N.º de lote <span class="text-muted">(opcional)</span></label>
+                        <input type="text" th:field="*{lotNumber}" class="form-control" placeholder="Ej: L-2026-09">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Fecha de vencimiento <span class="text-muted">(opcional, si aplica)</span></label>
+                    <input type="date" th:field="*{expirationDate}" class="form-control" style="max-width: 220px;">
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Guardar</button>
+                    <a th:href="@{/products}" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
+
+        </main>
+    </div>
+
+
+<script th:inline="javascript">
+    let barcodeScanner = null;
+    let barcodeScannerRunning = false;
+
+    const toggleBtn = document.getElementById('toggleScanBtn');
+    const scannerBox = document.getElementById('barcodeScannerBox');
+    const scanStatus = document.getElementById('barcodeScanStatus');
+    const barcodeInput = document.getElementById('barcodeInput');
+
+    function stopBarcodeScanner() {
+        if (barcodeScanner && barcodeScannerRunning) {
+            barcodeScanner.stop().catch(() => {});
+            barcodeScannerRunning = false;
+        }
+        toggleBtn.innerHTML = '<i class="bi bi-camera"></i> Escanear';
+    }
+
+    toggleBtn.addEventListener('click', function () {
+        if (barcodeScannerRunning) {
+            stopBarcodeScanner();
+            scannerBox.style.display = 'none';
+            return;
+        }
+
+        scannerBox.style.display = 'block';
+        scanStatus.textContent = 'Iniciando cámara…';
+        toggleBtn.innerHTML = '<i class="bi bi-x-circle"></i> Cancelar';
+
+        if (!barcodeScanner) {
+            barcodeScanner = new Html5Qrcode("barcodeReader");
+        }
+
+        Html5Qrcode.getCameras().then(cameras => {
+            if (!cameras || cameras.length === 0) {
+                scanStatus.textContent = 'No se encontró ninguna cámara disponible.';
+                return;
+            }
+            const preferred = cameras.find(c => /back|rear|environment/i.test(c.label)) || cameras[0];
+
+            barcodeScanner.start(
+                preferred.id,
+                { fps: 10, qrbox: { width: 250, height: 120 } },
+                (decodedText) => {
+                    barcodeInput.value = decodedText;
+                    scanStatus.textContent = 'Código detectado: ' + decodedText;
+                    stopBarcodeScanner();
+                    scannerBox.style.display = 'none';
+                },
+                () => {}
+            ).then(() => {
+                barcodeScannerRunning = true;
+                scanStatus.textContent = 'Apunta al código de barras…';
+            }).catch(err => {
+                scanStatus.textContent = 'No se pudo iniciar la cámara: ' + err;
+            });
+        }).catch(() => {
+            scanStatus.textContent = 'El navegador no dio permiso de cámara, o no estás en HTTPS.';
+        });
+    });
+</script>
+</body>
+</html>

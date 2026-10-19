@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Detalle de recomendación</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class=" py-4">
+
+            <h2 class="mb-4" th:text="'Recomendación - ' + ${product.name}">Recomendación</h2>
+
+            <table class="table" style="max-width: 500px;">
+                <tr><th>Cantidad recomendada</th><td th:text="${recommendation.recommendedQuantity}"></td></tr>
+                <tr><th>Prioridad</th><td th:text="${recommendation.priority}"></td></tr>
+                <tr><th>Riesgo de agotamiento</th><td th:text="${recommendation.stockoutRisk}"></td></tr>
+                <tr><th>Rotación</th><td th:text="${recommendation.rotation}"></td></tr>
+                <tr><th>Motivo</th><td th:text="${recommendation.reason}"></td></tr>
+            </table>
+			<form th:action="@{/recommendations/{id}/generate(id=${product.id})}" method="post" class="d-inline">
+			    <button type="submit" class="btn btn-outline-primary btn-sm">
+			        <i class="bi bi-arrow-clockwise"></i> Recalcular ahora
+			    </button>
+			</form>
+
+            <a th:href="@{/recommendations}" class="btn btn-secondary btn-sm">Volver</a>
+
+        </main>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="pager(page, baseUrl)" th:if="${page.totalPages > 1}">
+    <ul class="pagination">
+        <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+            <a class="page-link" th:href="@{${baseUrl}(page=${page.number - 1}, size=${page.size})}">Anterior</a>
+        </li>
+        <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+            th:classappend="${i == page.number} ? 'active'">
+            <a class="page-link" th:href="@{${baseUrl}(page=${i}, size=${page.size})}" th:text="${i + 1}">1</a>
+        </li>
+        <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+            <a class="page-link" th:href="@{${baseUrl}(page=${page.number + 1}, size=${page.size})}">Siguiente</a>
+        </li>
+    </ul>
+</nav>
+</body>
+</html>

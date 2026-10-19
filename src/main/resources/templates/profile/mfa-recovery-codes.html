@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Códigos de respaldo</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class="py-4">
+
+            <div class="card recovery-card">
+                <div class="card-body">
+                    <h2><i class="bi bi-shield-lock me-2"></i>Guarda tus códigos de respaldo</h2>
+                    <div class="alert alert-warning d-flex align-items-center gap-2 mt-3">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span>Estos códigos <strong>solo se muestran una vez</strong>. Guárdalos en un lugar seguro
+                            (gestor de contraseñas, papel impreso). Cada uno funciona <strong>una sola vez</strong> y
+                            reemplaza al código de tu app autenticadora si pierdes el dispositivo.</span>
+                    </div>
+
+                    <div class="recovery-grid">
+                        <code th:each="c : ${recoveryCodes}" th:text="${c}">XXXXX-XXXXX</code>
+                    </div>
+
+                    <a th:href="@{/profile}" class="btn btn-primary mt-4">
+                        <i class="bi bi-check2 me-1"></i>Ya los guardé, continuar
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</body>
+</html>

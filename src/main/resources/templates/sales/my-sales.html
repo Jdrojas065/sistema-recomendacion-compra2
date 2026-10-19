@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Mis ventas</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class=" py-4">
+
+            <h2 class="mb-4">Mis ventas</h2>
+
+            <table class="table table-hover">
+                <thead><tr><th>Fecha</th><th>Total</th><th></th></tr></thead>
+                <tbody>
+                <tr th:if="${salePage.empty}">
+                    <td colspan="3" class="text-muted">Todavía no has registrado ventas.</td>
+                </tr>
+                <tr th:each="s : ${salePage.content}">
+                    <td th:text="${#temporals.format(s.date, 'dd/MM/yyyy HH:mm')}">Fecha</td>
+                    <td th:text="${'$' + #numbers.formatDecimal(s.total, 1, 2)}">$0.00</td>
+                    <td><a th:href="@{/sales/{id}(id=${s.id})}" class="btn btn-sm btn-outline-secondary">Ver</a></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:replace="~{layout/pagination :: pager(${salePage}, '/sales/my-sales')}"></div>
+
+        </main>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Riesgo de agotamiento</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class=" py-4">
+
+            <h2 class="mb-4" th:text="'Riesgo de agotamiento - ' + ${product.name}">Riesgo</h2>
+
+            <span class="badge fs-6"
+                  th:classappend="${risk.name() == 'HIGH'} ? 'bg-danger' : (${risk.name() == 'MEDIUM'} ? 'bg-warning text-dark' : 'bg-success')"
+                  th:text="${risk}">HIGH</span>
+
+            <div class="mt-3">
+                <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-secondary btn-sm">Volver al producto</a>
+            </div>
+
+        </main>
+    </div>
+</div>
+</body>
+</html>

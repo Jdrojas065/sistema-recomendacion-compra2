@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Categorías</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class=" py-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Categorías</h2>
+                <a th:href="@{/categories/new}" class="btn btn-primary">Nueva categoría</a>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+            <table class="table table-hover">
+                <thead><tr><th>Nombre</th><th>Descripción</th><th></th></tr></thead>
+                <tbody>
+                <tr th:if="${categoryPage.empty}">
+                    <td colspan="3" class="text-muted">No hay categorías registradas.</td>
+                </tr>
+                <tr th:each="c : ${categoryPage.content}">
+                    <td th:text="${c.name}">Nombre</td>
+                    <td th:text="${c.description}">Descripción</td>
+                    <td><a th:href="@{/categories/{id}/edit(id=${c.id})}" class="btn btn-sm btn-outline-primary">Editar</a></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:replace="~{layout/pagination :: pager(${categoryPage}, '/categories')}"></div>
+
+        </main>
+    </div>
+</body>
+</html>

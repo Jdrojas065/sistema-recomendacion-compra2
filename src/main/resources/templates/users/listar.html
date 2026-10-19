@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Usuarios</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class="py-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Usuarios</h2>
+                <a th:href="@{/users/new}" class="btn btn-primary">Nuevo usuario</a>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+            <table class="table table-hover">
+                <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th></th></tr></thead>
+                <tbody>
+                <tr th:if="${userPage.empty}">
+                    <td colspan="4" class="text-muted">No hay usuarios registrados.</td>
+                </tr>
+                <tr th:each="u : ${userPage.content}">
+                    <td th:text="${u.name}">Nombre</td>
+                    <td th:text="${u.email}">Email</td>
+                    <td th:text="${u.role}">ADMIN</td>
+                    <td>
+                        <a th:href="@{/users/{id}/edit(id=${u.id})}" class="btn btn-sm btn-outline-primary">Editar</a>
+                        <form th:action="@{/users/{id}/deactivate(id=${u.id})}" method="post" class="d-inline"
+                              onsubmit="return confirm('¿Dar de baja este usuario?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Dar de baja</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:replace="~{layout/pagination :: pager(${userPage}, '/users')}"></div>
+
+        </main>
+	</div>
+</body>
+</html>

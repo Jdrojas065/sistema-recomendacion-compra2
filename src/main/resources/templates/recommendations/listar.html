@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Recomendaciones de compra</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+    <main class="py-4">
+
+        <div class="mb-4">
+            <h2 class="mb-1">Recomendaciones de compra</h2>
+            <p class="text-muted mb-0">Basado en demanda proyectada, stock actual y rotación de cada producto.</p>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-sm-4">
+                <div class="card summary-card summary-high">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="summary-label">Prioridad alta</div>
+                            <div class="summary-value" th:text="${highCount}">0</div>
+                        </div>
+                        <i class="bi bi-exclamation-triangle-fill text-danger fs-3"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card summary-card summary-medium">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="summary-label">Prioridad media</div>
+                            <div class="summary-value" th:text="${mediumCount}">0</div>
+                        </div>
+                        <i class="bi bi-dash-circle-fill fs-3" style="color:#e8a33d;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card summary-card summary-low">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="summary-label">Prioridad baja</div>
+                            <div class="summary-value" th:text="${lowCount}">0</div>
+                        </div>
+                        <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card data-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th class="text-end">Cant. recomendada</th>
+                        <th>Prioridad</th>
+                        <th>Riesgo</th>
+                        <th>Motivo</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${recommendationPage.empty}">
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="bi bi-lightbulb"></i>
+                                No hay recomendaciones generadas todavía.
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="r : ${recommendationPage.content}">
+                        <td>
+                            <a class="fw-semibold text-decoration-none"
+                               th:href="@{/recommendations/{id}(id=${r.product.id})}"
+                               th:text="${r.product.name}">Producto</a>
+                        </td>
+                        <td class="text-end fw-semibold" th:text="${r.recommendedQuantity}">0</td>
+                        <td>
+                            <span class="priority-pill"
+                                  th:classappend="${r.priority.name() == 'HIGH'} ? 'pill-high' : (${r.priority.name() == 'MEDIUM'} ? 'pill-medium' : 'pill-low')">
+                                <i class="bi"
+                                   th:classappend="${r.priority.name() == 'HIGH'} ? 'bi-exclamation-triangle-fill' : (${r.priority.name() == 'MEDIUM'} ? 'bi-dash-circle-fill' : 'bi-check-circle-fill')"></i>
+                                <span th:text="${r.priority}">HIGH</span>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill text-bg-light border" th:text="${r.stockoutRisk}">HIGH</span>
+                        </td>
+                        <td class="text-muted small" th:text="${r.reason}" style="max-width: 340px;">Motivo</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-3" th:replace="~{layout/pagination :: pager(${recommendationPage}, '/recommendations')}"></div>
+
+    </main>
+</div>
+</body>
+</html>

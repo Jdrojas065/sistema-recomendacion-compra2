@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Ocurrió un error</title>
+</head>
+<body class="bg-light">
+<div class="container d-flex align-items-center justify-content-center vh-100 text-center">
+    <div style="max-width: 500px;">
+        <h1 class="display-5 text-danger">Ocurrió un problema</h1>
+        <p class="lead" th:text="${message}">Ha ocurrido un error inesperado.</p>
+        <a th:href="@{/dashboard}" class="btn btn-primary">Volver al dashboard</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Registrar venta</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class="py-4">
+
+			<div class="d-flex justify-content-between align-items-center mb-4">
+			    <h2 class="mb-0">Registrar venta</h2>
+			    <a th:href="@{/sales/scan}" class="btn btn-outline-success">
+			        <i class="bi bi-camera me-1"></i>Escanear con el celular
+			    </a>
+			</div>
+
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+            <div class="row">
+                <div class="col-md-5">
+                    <h5><i class="bi bi-upc-scan me-1"></i>Escanear código de barras</h5>
+                    <form th:action="@{/sales/cart/add-by-barcode}" method="post" class="card p-3 mb-4" id="barcodeForm">
+                        <div class="mb-2">
+                            <input type="text" name="barcode" id="barcodeInput" class="form-control form-control-lg"
+                                   placeholder="Escanea aquí…" inputmode="numeric" autofocus autocomplete="off">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small text-muted">Cantidad</label>
+                            <input type="number" name="quantity" value="1" min="1" class="form-control" style="max-width: 120px;">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100"><i class="bi bi-plus-circle me-1"></i>Agregar por código</button>
+                        <div class="form-text">Compatible con lectores de código de barras USB (funcionan como teclado).</div>
+                    </form>
+
+                    <h5>Agregar producto manualmente</h5>
+                    <form th:action="@{/sales/cart/add}" method="post" class="card p-3">
+                        <div class="mb-3">
+                            <label class="form-label">Producto</label>
+                            <select name="productId" class="form-select" required>
+                                <option value="">Selecciona un producto</option>
+                                <option th:each="p : ${products}" th:value="${p.id}"
+                                        th:text="${p.name + ' - $' + #numbers.formatDecimal(p.price, 1, 2) + ' (stock: ' + p.currentStock + ')'}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" name="quantity" min="1" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary w-100">Agregar al carrito</button>
+                    </form>
+                </div>
+
+                <div class="col-md-7">
+                    <h5>Carrito</h5>
+                    <table class="table">
+                        <thead><tr><th>Producto</th><th>Cant.</th><th>Subtotal</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(cartItems)}">
+                            <td colspan="4" class="text-muted">El carrito está vacío.</td>
+                        </tr>
+                        <tr th:each="item, iter : ${cartItems}">
+                            <td th:text="${item.productName}">Producto</td>
+                            <td th:text="${item.quantity}">1</td>
+                            <td th:text="${'$' + #numbers.formatDecimal(item.subtotal, 1, 2)}">$0.00</td>
+                            <td>
+                                <form th:action="@{/sales/cart/remove/{index}(index=${iter.index})}" method="post">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Quitar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <p class="text-end fw-bold" th:if="${!#lists.isEmpty(cartItems)}">
+                        Total: <span th:text="${'$' + #numbers.formatDecimal(cartTotal, 1, 2)}">$0.00</span>
+                    </p>
+
+                    <form th:action="@{/sales}" method="post" th:if="${!#lists.isEmpty(cartItems)}">
+                        <button type="submit" class="btn btn-success w-100">Confirmar venta</button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </div>
+<script th:src="@{/js/sales-cart.js}"></script>
+</body>
+</html>

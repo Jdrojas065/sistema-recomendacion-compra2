@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<div th:fragment="sidebar" class="offcanvas offcanvas-start sidebar" tabindex="-1"
+     id="appSidebar" aria-labelledby="appSidebarLabel">
+
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="appSidebarLabel">Menú</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+
+    <div class="offcanvas-body">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2"></i>Dashboard</a>
+            </li>
+
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/products}"><i class="bi bi-box-seam"></i>Productos</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/categories}"><i class="bi bi-tags"></i>Categorías</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/inventory/stock}"><i class="bi bi-clipboard-data"></i>Inventario</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/sales/new}"><i class="bi bi-cart-plus"></i>Nueva venta</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/sales}"><i class="bi bi-receipt"></i>Todas las ventas</a>
+            </li>
+			<li class="nav-item" sec:authorize="hasRole('ADMIN')">
+			    <a class="nav-link" th:href="@{/sales/reports}"><i class="bi bi-bar-chart-line"></i>Reportes de ventas</a>
+			</li>
+            <li class="nav-item" sec:authorize="hasRole('EMPLOYEE')">
+                <a class="nav-link" th:href="@{/sales/my-sales}"><i class="bi bi-receipt"></i>Mis ventas</a>
+            </li>
+
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/recommendations}"><i class="bi bi-lightbulb"></i>Recomendaciones</a>
+            </li>
+			<li class="nav-item" sec:authorize="hasRole('ADMIN')">
+			    <a class="nav-link" th:href="@{/recommendations/early-warnings}"><i class="bi bi-graph-up-arrow"></i>Alertas tempranas</a>
+			</li>
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/anomalies}"><i class="bi bi-exclamation-triangle"></i>Anomalías</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/users}"><i class="bi bi-people"></i>Usuarios</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/profile}"><i class="bi bi-person-gear"></i>Mi perfil</a>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        (function () {
+            var container = document.currentScript.closest('.offcanvas');
+			// Resalta el link activo según la URL actual.
+			// Usa coincidencia exacta o por segmento de ruta (no substring plano),
+			// para que "/sales" no se marque activo estando en "/sales/reports".
+			var path = window.location.pathname;
+			var links = Array.from(container.querySelectorAll('.nav-link'));
+
+			var bestMatch = null;
+			links.forEach(function (link) {
+			    var href = link.getAttribute('href');
+			    if (!href || href === '/') return;
+
+			    var matches = path === href || path.startsWith(href + '/');
+			    if (matches && (!bestMatch || href.length > bestMatch.getAttribute('href').length)) {
+			        bestMatch = link;
+			    }
+			});
+
+			if (bestMatch) {
+			    bestMatch.classList.add('active');
+			}
+
+            // Cierra el menú automáticamente al hacer clic en un link
+            // (igual que en el menú de Éxito), para no tener que cerrarlo a mano.
+            container.querySelectorAll('.nav-link').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    var instance = bootstrap.Offcanvas.getInstance(container);
+                    if (instance) instance.hide();
+                });
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

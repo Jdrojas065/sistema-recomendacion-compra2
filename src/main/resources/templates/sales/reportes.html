@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Reportes de ventas</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+    <main class="py-4">
+
+        <h2 class="mb-4">Reportes de ventas</h2>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted mb-3">
+                            Ventas del mes actual (<span th:text="${currentMonthLabel}">9/2026</span>), día a día
+                        </h6>
+                        <canvas id="monthlyChart" height="260"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted mb-3">
+                            Ventas del año <span th:text="${currentYear}">2026</span>, mes a mes
+                        </h6>
+                        <canvas id="annualChart" height="260"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const monthlyLabels = /*[[${#lists.toList(monthlySales.![day])}]]*/ [];
+    const monthlyTotals = /*[[${#lists.toList(monthlySales.![total])}]]*/ [];
+
+    const annualTotals = /*[[${#lists.toList(annualSales.![total])}]]*/ [];
+    const annualLabels = ["Ene", "Feb", "Mar", "Abr", "May", "Jun",
+                           "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+    /*]]>*/
+
+    new Chart(document.getElementById('monthlyChart'), {
+        type: 'bar',
+        data: {
+            labels: monthlyLabels,
+            datasets: [{
+                label: 'Total vendido',
+                data: monthlyTotals,
+                backgroundColor: '#234f39'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    new Chart(document.getElementById('annualChart'), {
+        type: 'line',
+        data: {
+            labels: annualLabels,
+            datasets: [{
+                label: 'Total vendido',
+                data: annualTotals,
+                borderColor: '#234f39',
+                backgroundColor: 'rgba(35, 79, 57, 0.15)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+</body>
+</html>

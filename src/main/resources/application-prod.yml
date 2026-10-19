@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      # validate: evita cambios destructivos accidentales en producción (sección 24 del prompt)
+      ddl-auto: validate
+    show-sql: false
+
+  thymeleaf:
+    cache: true   # plantillas cacheadas en producción por rendimiento
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true    # requiere HTTPS — ver sección 5 del prompt
+        http-only: true
+
+ml:
+  service:
+    url: ${ML_SERVICE_URL}
+
+logging:
+  level:
+    root: WARN
+    com.example.recomendation: INFO

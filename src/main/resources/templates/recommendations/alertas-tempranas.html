@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Alertas tempranas de stock</title>
+    <style>
+        :root {
+            --ink: #1b1f27; --ink-muted: #6b7280; --ink-faint: #9aa1ac;
+            --line: #e2e5ea; --surface: #ffffff; --canvas: #f5f6f8;
+            --accent: #1e3a5f; --accent-soft: #eaeff5;
+            --high: #b3261e; --high-bg: #fbebea;
+            --medium: #92620a; --medium-bg: #fbf1de;
+        }
+        .ew-main { background: var(--canvas); color: var(--ink); }
+        .ew-head h1 { font-size: 1.6rem; font-weight: 600; margin: 0 0 .25rem; }
+        .ew-head p { color: var(--ink-muted); margin: 0 0 1.5rem; font-size: .9rem; }
+        .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+        .data-table th {
+            text-align: left; font-weight: 500; color: var(--ink-muted); font-size: .78rem;
+            padding: .7rem 1.25rem; border-bottom: 1px solid var(--line); white-space: nowrap;
+        }
+        .data-table td { padding: .8rem 1.25rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover td { background: #fafbfc; }
+        .empty-state { display: flex; flex-direction: column; align-items: center; gap: .4rem; color: var(--ink-faint); padding: 2.25rem 1rem; }
+        .empty-state i { font-size: 1.6rem; color: var(--line); }
+        .empty-state span { font-size: .88rem; color: var(--ink-muted); }
+        .status-pill {
+            display: inline-flex; align-items: center; gap: .4rem; padding: .15rem .6rem;
+            border-radius: 4px; font-size: .78rem; font-weight: 600; white-space: nowrap;
+        }
+        .status-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .status-pill.urgent { background: var(--high-bg); color: var(--high); }
+        .status-pill.trend { background: var(--medium-bg); color: var(--medium); }
+        .velocity-compare { display: inline-flex; align-items: center; gap: .35rem; font-variant-numeric: tabular-nums; }
+        .velocity-compare .arrow { color: var(--ink-faint); }
+        .velocity-compare .up { color: var(--medium); font-weight: 600; }
+    </style>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+    <main class="py-4 ew-main">
+            <div class="ew-head">
+                <h1>Alertas tempranas de stock</h1>
+                <p>Productos que todavía no están en stock bajo, pero que al ritmo de venta de los últimos
+                   7 días proyectan cruzar el mínimo en las próximas 2 semanas.</p>
+            </div>
+
+            <div class="panel">
+                <div class="table-scroll" style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Ritmo reciente vs. histórico</th>
+                            <th>Stock actual / mínimo</th>
+                            <th>Llega al mínimo</th>
+                            <th>Se agotaría</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(warnings)}">
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="bi bi-check2-circle"></i>
+                                    <span>No hay productos con riesgo de agotamiento proyectado en las próximas 2 semanas.</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:each="w : ${warnings}">
+                            <td>
+                                <div class="fw-semibold" th:text="${w.product().name}">Producto</div>
+                                <span class="status-pill trend mt-1" th:if="${w.trendAccelerating()}">
+                                    <i class="bi bi-graph-up-arrow"></i> Tendencia al alza
+                                </span>
+                            </td>
+                            <td>
+                                <span class="velocity-compare">
+                                    <span th:text="${w.baselineDailyAvg()} + '/día habitual'">5/día habitual</span>
+                                    <i class="bi bi-arrow-right arrow"></i>
+                                    <span class="up" th:text="${w.recentDailyAvg()} + '/día reciente'">9.5/día reciente</span>
+                                </span>
+                            </td>
+                            <td>
+                                <span th:text="${w.product().currentStock}">0</span>
+                                <span class="text-muted"> / </span>
+                                <span th:text="${w.product().minimumStock}">0</span>
+                            </td>
+                            <td>
+                                <span class="status-pill urgent">
+                                    <i class="bi bi-calendar-event"></i>
+                                    <span th:text="'~' + ${w.daysUntilMinimum()} + ' días'">~8 días</span>
+                                </span>
+                                <div class="text-muted small mt-1" th:text="${#temporals.format(w.projectedMinimumDate(), 'dd/MM/yyyy')}">--/--/----</div>
+                            </td>
+                            <td>
+                                <span th:text="'~' + ${w.daysUntilStockout()} + ' días'">~10 días</span>
+                                <div class="text-muted small mt-1" th:text="${#temporals.format(w.projectedStockoutDate(), 'dd/MM/yyyy')}">--/--/----</div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+</body>
+</html>

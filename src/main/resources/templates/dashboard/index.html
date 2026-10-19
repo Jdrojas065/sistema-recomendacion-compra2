@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1b1f27;
+            --ink-muted: #6b7280;
+            --ink-faint: #9aa1ac;
+            --line: #e2e5ea;
+            --surface: #ffffff;
+            --canvas: #f5f6f8;
+            --accent: #1e3a5f;
+            --accent-soft: #eaeff5;
+            --high: #b3261e;
+            --high-bg: #fbebea;
+            --medium: #92620a;
+            --medium-bg: #fbf1de;
+            --low: #2e7d53;
+            --low-bg: #e9f5ef;
+        }
+
+        .dash-main {
+            background: var(--canvas);
+            color: var(--ink);
+        }
+
+        /* ---------- Encabezado ---------- */
+        .dash-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .dash-head h1 {
+            font-family: "Source Serif 4", Georgia, serif;
+            font-weight: 600;
+            font-size: 1.85rem;
+            letter-spacing: -0.01em;
+            margin: 0;
+        }
+
+        .dash-head p {
+            color: var(--ink-muted);
+            margin: 0;
+            font-size: .9rem;
+        }
+
+        .dash-updated {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .78rem;
+            color: var(--ink-faint);
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: .3rem .75rem;
+        }
+        .dash-updated i { font-size: .7rem; color: var(--low); }
+
+        .dash-alert {
+            display: flex;
+            align-items: center;
+            gap: .55rem;
+            border: 1px solid #bfe3cc;
+            background: var(--low-bg);
+            color: #1d5c3d;
+            border-radius: 6px;
+            padding: .75rem 1rem;
+            font-size: .9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ---------- KPIs ---------- */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi {
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.15rem 1.3rem;
+            transition: box-shadow .15s ease, transform .15s ease;
+        }
+        .kpi:hover {
+            box-shadow: 0 4px 14px rgba(27, 31, 39, 0.06);
+            transform: translateY(-1px);
+        }
+        .kpi.is-critical { border-left-color: var(--high); }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .kpi-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 7px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 1rem;
+        }
+        .kpi.is-critical .kpi-icon { background: var(--high-bg); color: var(--high); }
+
+        .kpi-label {
+            color: var(--ink-muted);
+            font-size: .82rem;
+            margin: 0;
+        }
+
+        .kpi-value {
+            font-variant-numeric: tabular-nums;
+            font-size: 2.15rem;
+            font-weight: 600;
+            line-height: 1;
+            margin: 0;
+        }
+
+        .kpi-link {
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: .25rem;
+        }
+        .kpi-link:hover { text-decoration: underline; }
+        .kpi.is-critical .kpi-link { color: var(--high); }
+
+        /* ---------- Paneles ---------- */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .panel-header-text {
+            display: flex;
+            align-items: flex-start;
+            gap: .65rem;
+        }
+
+        .panel-icon {
+            color: var(--accent);
+            font-size: 1.05rem;
+            margin-top: .1rem;
+        }
+
+        .panel-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .panel-header p {
+            font-size: .82rem;
+            color: var(--ink-muted);
+            margin: .2rem 0 0;
+        }
+
+        .panel-link {
+            flex-shrink: 0;
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .panel-link:hover { text-decoration: underline; }
+
+        .table-scroll { overflow-x: auto; }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .9rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            font-weight: 500;
+            color: var(--ink-muted);
+            font-size: .78rem;
+            padding: .6rem 1.25rem;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: .7rem 1.25rem;
+            border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tbody tr:hover td {
+            background: #fafbfc;
+        }
+
+        .data-table .empty-row td {
+            padding: 2.25rem 1rem;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .4rem;
+            color: var(--ink-faint);
+        }
+        .empty-state i { font-size: 1.4rem; color: var(--line); }
+        .empty-state span { font-size: .85rem; color: var(--ink-muted); }
+
+        .rec-row {
+            border-left: 3px solid transparent;
+        }
+
+        .rec-row.priority-high { border-left-color: var(--high); }
+        .rec-row.priority-medium { border-left-color: var(--medium); }
+        .rec-row.priority-low { border-left-color: var(--low); }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .15rem .6rem;
+            border-radius: 4px;
+            font-size: .78rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-pill::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-pill.priority-high, .status-pill.severity-high {
+            background: var(--high-bg);
+            color: var(--high);
+        }
+
+        .status-pill.priority-medium, .status-pill.severity-medium {
+            background: var(--medium-bg);
+            color: var(--medium);
+        }
+
+        .status-pill.priority-low, .status-pill.severity-low {
+            background: var(--low-bg);
+            color: var(--low);
+        }
+
+        .reason-cell {
+            color: var(--ink-muted);
+            max-width: 360px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* ---------- Panel de bienvenida (EMPLOYEE) ---------- */
+        .welcome-panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.75rem;
+        }
+
+        .welcome-panel h2 {
+            font-family: "Source Serif 4", Georgia, serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 .4rem;
+        }
+
+        .welcome-panel p {
+            margin: 0 0 1.25rem;
+            color: var(--ink-muted);
+            max-width: 46ch;
+        }
+
+        .welcome-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .75rem;
+        }
+
+        .btn-dash {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            font-size: .88rem;
+            font-weight: 600;
+            padding: .55rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: filter .15s ease;
+        }
+        .btn-dash-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-dash-outline {
+            background: var(--surface);
+            color: var(--accent);
+            border: 1px solid var(--line);
+        }
+        .btn-dash:hover { filter: brightness(1.1); color: inherit; }
+
+        @media (max-width: 900px) {
+            .two-col { grid-template-columns: 1fr; }
+            .kpi-row { grid-template-columns: 1fr; }
+            .panel-header { flex-direction: column; align-items: flex-start; }
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .data-table tbody tr td { transition: background-color .12s ease; }
+            .panel, .kpi { animation: fadeInUp .35s ease both; }
+            .kpi-row .kpi:nth-child(2) { animation-delay: .05s; }
+            .two-col .panel:nth-child(2) { animation-delay: .05s; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+
+    <main class="py-4 dash-main">
+
+        <div class="dash-head">
+            <div>
+                <h1>Dashboard</h1>
+                <p>Estado general del inventario y las ventas.</p>
+            </div>
+            <span class="dash-updated">
+                <i class="bi bi-record-fill"></i>
+                Actualizado: <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy HH:mm')}">--/--/---- --:--</span>
+            </span>
+        </div>
+
+        <div th:if="${successMessage}" class="dash-alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <div sec:authorize="hasRole('ADMIN')">
+
+            <div class="kpi-row" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+                <div class="kpi" th:classappend="${highSeverityAnomaliesCount > 0} ? 'is-critical' : ''">
+                    <div class="kpi-top">
+                        <p class="kpi-label">Anomalías de alta severidad</p>
+                        <span class="kpi-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+                    </div>
+                    <p class="kpi-value" th:text="${highSeverityAnomaliesCount}">0</p>
+                    <a class="kpi-link" th:href="@{/anomalies}">
+                        Ver anomalías <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="kpi">
+                    <div class="kpi-top">
+                        <p class="kpi-label">Productos con stock bajo</p>
+                        <span class="kpi-icon"><i class="bi bi-box-seam"></i></span>
+                    </div>
+                    <p class="kpi-value" th:text="${#lists.size(lowStockProducts)}">0</p>
+                    <a class="kpi-link" th:href="@{/inventory/stock}">
+                        Ver inventario <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="kpi" th:classappend="${earlyWarningsCount > 0} ? 'is-critical' : ''">
+                    <div class="kpi-top">
+                        <p class="kpi-label">Alertas tempranas de stock</p>
+                        <span class="kpi-icon"><i class="bi bi-graph-up-arrow"></i></span>
+                    </div>
+                    <p class="kpi-value" th:text="${earlyWarningsCount}">0</p>
+                    <a class="kpi-link" th:href="@{/recommendations/early-warnings}">
+                        Ver proyecciones <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-header-text">
+                        <i class="bi bi-lightbulb panel-icon"></i>
+                        <div>
+                            <h2>Recomendaciones de mayor prioridad</h2>
+                            <p>Qué comprar primero, según el riesgo de quiebre de stock.</p>
+                        </div>
+                    </div>
+                    <a class="panel-link" th:href="@{/recommendations}">Ver todas</a>
+                </div>
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                        <tr><th>Producto</th><th>Prioridad</th><th>Motivo</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr class="empty-row" th:if="${#lists.isEmpty(topRecommendations)}">
+                            <td colspan="3">
+                                <div class="empty-state">
+                                    <i class="bi bi-inboxes"></i>
+                                    <span>No hay recomendaciones registradas todavía.</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="rec-row"
+                            th:each="rec : ${topRecommendations}"
+                            th:classappend="'priority-' + ${#strings.toLowerCase(rec.priority.name())}">
+                            <td th:text="${rec.product.name}">Producto</td>
+                            <td>
+                                <span class="status-pill"
+                                      th:classappend="'priority-' + ${#strings.toLowerCase(rec.priority.name())}"
+                                      th:text="${rec.priority}">HIGH</span>
+                            </td>
+                            <td class="reason-cell" th:text="${rec.reason}">Motivo</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-header-text">
+                            <i class="bi bi-clipboard-data panel-icon"></i>
+                            <div>
+                                <h2>Productos con stock bajo</h2>
+                                <p>Por debajo de su mínimo definido.</p>
+                            </div>
+                        </div>
+                        <a class="panel-link" th:href="@{/inventory/stock}">Ver todo</a>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <thead>
+                            <tr><th>Producto</th><th>Actual</th><th>Mínimo</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr class="empty-row" th:if="${#lists.isEmpty(lowStockProducts)}">
+                                <td colspan="3">
+                                    <div class="empty-state">
+                                        <i class="bi bi-check2-circle"></i>
+                                        <span>No hay productos con stock bajo.</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="p : ${lowStockProducts}">
+                                <td th:text="${p.name}">Producto</td>
+                                <td th:text="${p.currentStock}">0</td>
+                                <td th:text="${p.minimumStock}">0</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-header-text">
+                            <i class="bi bi-graph-up-arrow panel-icon"></i>
+                            <div>
+                                <h2>Anomalías recientes</h2>
+                                <p>Ventas fuera del patrón habitual.</p>
+                            </div>
+                        </div>
+                        <a class="panel-link" th:href="@{/anomalies}">Ver todo</a>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <thead>
+                            <tr><th>Producto</th><th>Fecha</th><th>Severidad</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr class="empty-row" th:if="${#lists.isEmpty(recentAnomalies)}">
+                                <td colspan="3">
+                                    <div class="empty-state">
+                                        <i class="bi bi-check2-circle"></i>
+                                        <span>No hay anomalías registradas todavía.</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="a : ${recentAnomalies}">
+                                <td th:text="${a.product.name}">Producto</td>
+                                <td th:text="${#temporals.format(a.date, 'dd/MM/yyyy HH:mm')}">Fecha</td>
+                                <td>
+                                    <span class="status-pill"
+                                          th:classappend="'severity-' + ${#strings.toLowerCase(a.severity)}"
+                                          th:text="${a.severity}">HIGH</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div sec:authorize="hasRole('EMPLOYEE')" class="welcome-panel">
+            <h2>Bienvenido de nuevo</h2>
+            <p>Desde aquí puedes registrar una nueva venta o consultar tus ventas anteriores.</p>
+            <div class="welcome-actions">
+                <a class="btn-dash btn-dash-primary" th:href="@{/sales/new}">
+                    <i class="bi bi-cart-plus"></i> Registrar venta
+                </a>
+                <a class="btn-dash btn-dash-outline" th:href="@{/sales/my-sales}">
+                    <i class="bi bi-receipt"></i> Ver mis ventas
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+</div>
+</body>
+</html>

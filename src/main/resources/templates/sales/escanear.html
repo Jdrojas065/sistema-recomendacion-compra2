@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Escanear producto</title>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class=" py-4">
+
+            <h2 class="mb-3"><i class="bi bi-camera me-2"></i>Escanear producto</h2>
+            <p class="text-muted">Apunta la cámara del celular al código de barras del producto.</p>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <label class="form-label small text-muted">Cámara</label>
+                        <select id="cameraSelect" class="form-select form-select-sm" style="max-width: 300px;"></select>
+                    </div>
+                    <div id="reader" style="width: 100%; max-width: 400px;"></div>
+                    <div id="scanStatus" class="alert alert-secondary mt-3">Iniciando cámara…</div>
+                </div>
+                <div class="col-md-6">
+                    <h5>Carrito actual</h5>
+                    <p id="cartInfo" class="text-muted">0 productos — $0.00</p>
+                    <div id="lastScanned"></div>
+                    <a th:href="@{/sales/new}" class="btn btn-primary mt-3">
+                        <i class="bi bi-cart-check me-1"></i>Ir a confirmar venta
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    
+</div>
+
+<script th:inline="javascript">
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+    const statusBox = document.getElementById('scanStatus');
+    const cartInfo = document.getElementById('cartInfo');
+    const lastScanned = document.getElementById('lastScanned');
+    const cameraSelect = document.getElementById('cameraSelect');
+
+    let lastCode = null;
+    let lastScanTime = 0;
+    const COOLDOWN_MS = 2500; // evita agregar el mismo código varias veces seguidas
+
+    function onScanSuccess(decodedText) {
+        const now = Date.now();
+        if (decodedText === lastCode && (now - lastScanTime) < COOLDOWN_MS) {
+            return; // mismo código leído hace muy poco, lo ignoramos
+        }
+        lastCode = decodedText;
+        lastScanTime = now;
+
+        statusBox.className = 'alert alert-info mt-3';
+        statusBox.textContent = 'Procesando código ' + decodedText + '…';
+
+        fetch(/*[[@{/sales/api/cart/add-by-barcode}]]*/ '/sales/api/cart/add-by-barcode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify({ barcode: decodedText, quantity: 1 })
+        })
+        .then(res => res.json())
+        .then(data => {
+            statusBox.className = data.success ? 'alert alert-success mt-3' : 'alert alert-danger mt-3';
+            statusBox.textContent = data.message;
+            cartInfo.textContent = data.cart.itemCount + ' productos — $' + data.cart.total.toFixed(2);
+
+            if (data.success) {
+                const entry = document.createElement('div');
+                entry.className = 'small text-muted';
+                entry.textContent = new Date().toLocaleTimeString() + ' — ' + data.productName;
+                lastScanned.prepend(entry);
+            }
+        })
+        .catch(() => {
+            statusBox.className = 'alert alert-danger mt-3';
+            statusBox.textContent = 'Error de conexión con el servidor.';
+        });
+    }
+
+    const scanner = new Html5Qrcode("reader");
+    let currentCameraId = null;
+
+    function startCamera(cameraId) {
+        const proceed = () => {
+            currentCameraId = cameraId;
+            scanner.start(
+                cameraId,
+                { fps: 10, qrbox: { width: 250, height: 120 } },
+                onScanSuccess,
+                () => {} // errores de lectura frame a frame, se ignoran (es normal, pasa constantemente mientras enfoca)
+            ).then(() => {
+                statusBox.className = 'alert alert-secondary mt-3';
+                statusBox.textContent = 'Cámara lista. Apunta al código de barras.';
+            }).catch(err => {
+                statusBox.className = 'alert alert-danger mt-3';
+                statusBox.textContent = 'No se pudo iniciar la cámara: ' + err;
+            });
+        };
+
+        if (currentCameraId) {
+            scanner.stop().then(proceed).catch(proceed);
+        } else {
+            proceed();
+        }
+    }
+
+    Html5Qrcode.getCameras().then(cameras => {
+        if (!cameras || cameras.length === 0) {
+            statusBox.className = 'alert alert-danger mt-3';
+            statusBox.textContent = 'No se encontró ninguna cámara disponible.';
+            return;
+        }
+
+        cameras.forEach((cam, index) => {
+            const option = document.createElement('option');
+            option.value = cam.id;
+            option.textContent = cam.label || ('Cámara ' + (index + 1));
+            cameraSelect.appendChild(option);
+        });
+
+        // Preferimos la que suene a cámara trasera (celulares); si no, la primera de la lista
+        // (normalmente la webcam RGB principal, no la IR, en la mayoría de laptops).
+        const preferred = cameras.find(c => /back|rear|environment/i.test(c.label)) || cameras[0];
+        cameraSelect.value = preferred.id;
+        startCamera(preferred.id);
+    }).catch(() => {
+        statusBox.className = 'alert alert-danger mt-3';
+        statusBox.textContent = 'El navegador no dio permiso de cámara, o no estás en HTTPS.';
+    });
+
+    cameraSelect.addEventListener('change', () => startCamera(cameraSelect.value));
+</script>
+</body>
+</html>

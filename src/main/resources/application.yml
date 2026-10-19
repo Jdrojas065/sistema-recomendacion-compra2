@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: sistema-recomendacion-compra2
+
+  profiles:
+    active: dev
+
+  thymeleaf:
+    cache: false   # se sobreescribe a true en prod (ver application-prod.yml)
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: minimercado123
+    key-store-type: PKCS12
+    key-alias: minimercado				
+  servlet:
+    session:
+      timeout: 30m   # expiración de sesión configurable, ver sección 5 del prompt
+
+logging:
+  level:
+    root: INFO
+    com.example.recomendation: DEBUG
+
+jwt:
+  secret: ${JWT_SECRET:cambia-esto-por-una-clave-larga-y-aleatoria-de-al-menos-256-bits}
+  expiration-ms: 1800000   # 1 hora

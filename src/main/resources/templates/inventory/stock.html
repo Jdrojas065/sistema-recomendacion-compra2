@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Stock de inventario</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class=" py-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Stock de inventario</h2>
+                <a th:href="@{/inventory/movements/new}" class="btn btn-primary">Registrar movimiento</a>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+            <table class="table table-hover">
+                <thead><tr><th>Producto</th><th>Categoría</th><th>Stock actual</th><th>Stock mín.</th><th></th></tr></thead>
+                <tbody>
+                <tr th:if="${productPage.empty}">
+                    <td colspan="5" class="text-muted">No hay productos registrados.</td>
+                </tr>
+                <tr th:each="p : ${productPage.content}">
+                    <td th:text="${p.name}">Producto</td>
+                    <td th:text="${p.category.name}">Categoría</td>
+                    <td>
+                        <span th:text="${p.currentStock}"
+                              th:classappend="${p.currentStock <= p.minimumStock} ? 'badge bg-danger' : 'badge bg-success'"></span>
+                    </td>
+                    <td th:text="${p.minimumStock}">0</td>
+                    <td><a th:href="@{/inventory/history/{id}(id=${p.id})}" class="btn btn-sm btn-outline-secondary">Historial</a></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:replace="~{layout/pagination :: pager(${productPage}, '/inventory/stock')}"></div>
+
+        </main>
+    </div>
+</body>
+</html>

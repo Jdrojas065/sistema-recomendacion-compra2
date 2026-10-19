@@ -1,0 +1,557 @@
+:root {
+    --brand-primary: #2f6f4f;
+    --brand-primary-dark: #234f39;
+    --brand-accent: #e8a33d;
+    --bg-app: #f4f6f5;
+    --surface: #ffffff;
+    --text-main: #212b26;
+    --text-muted: #6b756f;
+    --border-soft: #e3e8e5;
+    --radius: 0.65rem;
+}
+
+body {
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+main {
+    min-height: calc(100vh - 60px);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* --- Navbar --- */
+.navbar {
+    background-color: var(--brand-primary-dark) !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    background-color: var(--surface);
+    border-right: 1px solid var(--border-soft);
+}
+.sidebar .nav-link {
+    color: var(--text-main);
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.8rem;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.93rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.sidebar .nav-link:hover {
+    background-color: #eef4f0;
+    color: var(--brand-primary-dark);
+}
+.sidebar .nav-link.active {
+    background-color: var(--brand-primary);
+    color: #fff;
+}
+.sidebar .nav-link i {
+    font-size: 1rem;
+    width: 1.1rem;
+    text-align: center;
+}
+
+/* --- Cards --- */
+.card {
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.card .card-body {
+    padding: 1.25rem;
+}
+
+/* --- Botones --- */
+.btn-primary {
+    background-color: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
+.btn-primary:hover {
+    background-color: var(--brand-primary-dark);
+    border-color: var(--brand-primary-dark);
+}
+.btn-outline-secondary {
+    color: var(--text-muted);
+    border-color: var(--border-soft);
+}
+
+/* --- Tablas --- */
+.table {
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+.table th {
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    background-color: #f8faf9;
+    border-bottom: 1px solid var(--border-soft);
+}
+.table td {
+    vertical-align: middle;
+}
+.table-hover tbody tr:hover {
+    background-color: #f4f9f6;
+}
+
+/* --- Badges de prioridad / riesgo --- */
+.badge {
+    font-weight: 500;
+    padding: 0.4em 0.7em;
+    border-radius: 0.4rem;
+}
+
+/* --- Formularios --- */
+.form-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 0.2rem rgba(47, 111, 79, 0.15);
+}
+
+/* --- Alertas --- */
+.alert {
+    border-radius: var(--radius);
+    border: none;
+}
+
+
+
+/* =========================================================
+   LOGIN — LOGISTIQ
+   ========================================================= */
+:root {
+    --login-navy: #0d2b3e;
+    --login-teal: #157f76;
+    --login-cyan: #2fb6c4;
+    --login-accent: #f0a33d;
+}
+
+body.login-page {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.login-wrapper {
+    display: flex;
+    height: 100vh;
+}
+
+/* --- Panel izquierdo: marca --- */
+.login-brand {
+    position: relative;
+    flex: 1 1 45%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background: linear-gradient(135deg, var(--login-navy) 0%, var(--login-teal) 55%, var(--login-cyan) 100%);
+    overflow: hidden;
+}
+.login-brand::before,
+.login-brand::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+}
+.login-brand::before { width: 420px; height: 420px; top: -120px; right: -120px; }
+.login-brand::after   { width: 280px; height: 280px; bottom: -100px; left: -80px; }
+
+.login-brand-content {
+    position: relative;
+    z-index: 1;
+    max-width: 380px;
+    text-align: center;
+    animation: fadeInUp 0.5s ease;
+}
+.login-logo {
+    width: 100%;
+    max-width: 320px;
+    filter: drop-shadow(0 6px 18px rgba(0,0,0,0.25));
+    margin-bottom: 0.5rem;
+}
+.login-tagline {
+    color: rgba(255,255,255,0.85);
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;
+    margin-bottom: 2rem;
+}
+.login-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+.login-features li {
+    color: #fff;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 0.55rem;
+    padding: 0.6rem 0.85rem;
+}
+.login-features i {
+    color: var(--login-accent);
+    font-size: 1.05rem;
+}
+
+/* --- Panel derecho: formulario --- */
+.login-form-panel {
+    flex: 1 1 55%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-app);
+    padding: 2rem;
+}
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    animation: fadeInUp 0.5s ease 0.1s both;
+}
+.login-card-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+.login-card-header {
+    margin-bottom: 1.75rem;
+}
+
+.login-input-group .input-group-text {
+    background-color: #fff;
+    border-right: none;
+    color: var(--text-muted);
+}
+.login-input-group .form-control {
+    border-left: none;
+}
+.login-input-group .form-control:focus {
+    border-color: var(--login-teal);
+    box-shadow: 0 0 0 0.2rem rgba(21, 127, 118, 0.15);
+}
+.login-input-group .form-control:focus + .toggle-password,
+.login-input-group:focus-within .input-group-text {
+    border-color: var(--login-teal);
+}
+.toggle-password {
+    border-color: #ced4da;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, var(--login-teal), var(--login-navy));
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.65rem 1rem;
+    border-radius: 0.55rem;
+    transition: filter 0.15s ease, transform 0.15s ease;
+}
+.btn-login:hover {
+    filter: brightness(1.1);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.login-demo-note {
+    margin-top: 1.5rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    background-color: #eef4f0;
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.8rem;
+}
+.login-demo-note code {
+    color: var(--login-navy);
+    background: none;
+    padding: 0;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Responsive: apilar en pantallas pequeñas --- */
+@media (max-width: 860px) {
+    .login-wrapper { flex-direction: column; height: auto; min-height: 100vh; }
+    body.login-page { height: auto; overflow: auto; }
+    .login-brand { flex: none; padding: 2rem 1.5rem; }
+    .login-features { display: none; } /* se ocultan para no saturar el móvil */
+    .login-logo { max-width: 220px; }
+    .login-form-panel { flex: none; padding: 2.5rem 1.5rem; }
+}
+
+/* =========================================================
+   SIDEBAR — grupos desplegables
+   ========================================================= */
+.sidebar-group-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+}
+.sidebar-group-toggle span {
+    flex: 1;
+}
+.sidebar-chevron {
+    font-size: 0.75rem !important;
+    width: auto !important;
+    transition: transform 0.2s ease;
+}
+.sidebar-group-toggle.open .sidebar-chevron {
+    transform: rotate(180deg);
+}
+
+.sidebar-submenu {
+    list-style: none;
+    padding-left: 0.5rem;
+    margin: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+}
+.sidebar-submenu .nav-link {
+    font-size: 0.87rem;
+    padding-left: 1.6rem;
+}
+.sidebar-submenu .nav-link i.bi-dot {
+    font-size: 1.4rem;
+    line-height: 0;
+    width: 1.1rem;
+}
+
+/* =========================================================
+   MFA — códigos de respaldo
+   ========================================================= */
+.recovery-card { max-width: 640px; }
+.recovery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: .75rem;
+    margin-top: 1.5rem;
+}
+.recovery-grid code {
+    display: block;
+    text-align: center;
+    padding: .75rem;
+    background-color: #f8faf9;
+    border: 1px dashed var(--border-soft);
+    border-radius: .5rem;
+    font-size: 1.05rem;
+    letter-spacing: .05em;
+    color: var(--text-main);
+}
+
+
+
+
+
+
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1040;
+}
+
+.offcanvas.sidebar {
+    width: 260px;
+}
+.offcanvas-header {
+    border-bottom: 1px solid var(--border-soft);
+}
+
+
+
+
+/* =========================================================
+   Tarjetas de resumen (recomendaciones / anomalías)
+   ========================================================= */
+.summary-card {
+    border: none;
+    border-left: 4px solid var(--border-soft);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.summary-card.summary-high  { border-left-color: #dc3545; }
+.summary-card.summary-medium{ border-left-color: #e8a33d; }
+.summary-card.summary-low   { border-left-color: #2f6f4f; }
+
+.summary-card .summary-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+}
+.summary-card .summary-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+.priority-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+.priority-pill.pill-high   { background: #fdecec; color: #b3211f; }
+.priority-pill.pill-medium { background: #fdf3e2; color: #96650f; }
+.priority-pill.pill-low    { background: #e9f4ee; color: #1f5a3c; }
+
+.data-card {
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.data-card table {
+    margin-bottom: 0;
+}
+.data-card thead th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-soft);
+    background: #fafbfa;
+}
+.data-card tbody tr:hover {
+    background-color: #f7f9f8;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+}
+.empty-state i {
+    font-size: 2.5rem;
+    opacity: 0.4;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.value-transition {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-variant-numeric: tabular-nums;
+}
+.value-transition .arrow {
+    color: var(--text-muted);
+}
+
+
+
+
+/* =========================================================
+   Tarjetas de predicción (comparación tradicional vs ML)
+   ========================================================= */
+.prediction-card {
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    height: 100%;
+}
+.prediction-value {
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.75rem;
+    font-variant-numeric: tabular-nums;
+}
+.prediction-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+.prediction-icon-traditional {
+    background: #eef2f6;
+    color: #445b73;
+}
+.prediction-icon-ml {
+    background: #eaf4ee;
+    color: #1f5a3c;
+}
+
+.insight-panel {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #fafbfa;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: 0.85rem 1.1rem;
+    font-size: 0.9rem;
+    color: #3b4148;
+}
+
+/* Panel explicativo colapsable */
+.info-disclosure {
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    background: #fafbfc;
+}
+.info-disclosure summary {
+    cursor: pointer;
+    padding: 0.75rem 1.1rem;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #445b73;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+}
+.info-disclosure summary::-webkit-details-marker {
+    display: none;
+}
+.info-disclosure[open] summary {
+    border-bottom: 1px solid var(--border-soft);
+}
+.info-disclosure-body {
+    padding: 0.9rem 1.1rem 1rem;
+    font-size: 0.85rem;
+    color: #5b6470;
+    line-height: 1.55;
+}
+.info-disclosure-body p {
+    margin-bottom: 0.65rem;
+}

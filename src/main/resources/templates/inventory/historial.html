@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/base :: head-assets}"></th:block>
+    <title>Historial de movimientos</title>
+</head>
+<body>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+<div th:replace="~{layout/sidebar :: sidebar}"></div>
+<div class="container-fluid">
+        <div class="col-md-2 p-0" th:replace="~{layout/sidebar :: sidebar}"></div>
+        <main class="py-4">
+
+            <h2 class="mb-4" th:text="'Historial de ' + ${product.name}">Historial</h2>
+
+            <table class="table table-hover">
+                <thead><tr><th>Fecha</th><th>Tipo</th><th>Cantidad</th><th>Usuario</th><th>Descripción</th></tr></thead>
+                <tbody>
+                <tr th:if="${movementPage.empty}">
+                    <td colspan="5" class="text-muted">No hay movimientos registrados para este producto.</td>
+                </tr>
+                <tr th:each="m : ${movementPage.content}">
+                    <td th:text="${#temporals.format(m.date, 'dd/MM/yyyy HH:mm')}">Fecha</td>
+                    <td>
+                        <span class="badge" th:classappend="${m.type.name() == 'IN'} ? 'bg-success' : 'bg-secondary'"
+                              th:text="${m.type}">IN</span>
+                    </td>
+                    <td th:text="${m.quantity}">0</td>
+                    <td th:text="${m.user.name}">Usuario</td>
+                    <td th:text="${m.description}">-</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:replace="~{layout/pagination :: pager(${movementPage}, '/inventory/history/' + ${product.id})}"></div>
+
+            <a th:href="@{/inventory/stock}" class="btn btn-secondary btn-sm mt-2">Volver</a>
+
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:sistema_recomendacion_compra;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+
+  jpa:
+    hibernate:
+      # update: simplicidad para dos estudiantes iterando rápido en desarrollo (sección 24 del prompt)
+      ddl-auto: update
+    show-sql: true
+    # Sin database-platform explícito: Hibernate lo detecta solo a partir de la URL (H2Dialect).
+    # No dejar aquí el MySQLDialect que quedó de cuando probamos con Clever Cloud.
+
+  thymeleaf:
+    cache: false   # recarga las plantillas sin reiniciar la app
+
+ml:
+  service:
+    url: ${ML_SERVICE_URL:http://localhost:8000}
